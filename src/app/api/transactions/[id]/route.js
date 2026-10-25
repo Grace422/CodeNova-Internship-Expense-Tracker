@@ -1,24 +1,28 @@
+
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 import connectDB from "@/lib/mongodb";
-import Transaction from "@/models/Transaction";
 
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { error: "Invalid transaction ID" },
         { status: 400 }
       );
     }
 
-    await connectDB();
+    const database = await connectDB();
 
-    const transaction = await Transaction.findByIdAndDelete(id);
+    const result = await database
+      .collection("ExpenseCollection")
+      .deleteOne({
+        _id: new ObjectId(id)
+      });
 
-    if (!transaction) {
+    if (result.deletedCount === 0) {
       return NextResponse.json(
         { error: "Transaction not found" },
         { status: 404 }
