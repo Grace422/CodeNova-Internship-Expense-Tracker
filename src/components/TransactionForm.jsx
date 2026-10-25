@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -38,6 +39,8 @@ export default function TransactionForm({ onTransactionAdded }) {
   function handleTypeChange(newType) {
     setType(newType);
     setCategory(categories[newType][0]);
+    setError("");
+    setSuccess("");
   }
 
   async function handleSubmit(event) {
@@ -105,43 +108,55 @@ export default function TransactionForm({ onTransactionAdded }) {
     }
   }
 
+  const inputClasses =
+    "w-full min-w-0 rounded-xl border border-border bg-page px-4 py-3 text-primary-text outline-none transition placeholder:text-secondary-text/70 focus:border-accent focus:ring-2 focus:ring-accent/20";
+
   return (
-    <section className="transaction-form-card">
-      <div className="section-heading">
+    <section className="min-w-0 rounded-2xl border border-border bg-card p-5 text-primary-text shadow-sm sm:p-6">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h2>Add Transaction</h2>
-          <p>Record your income or expenses.</p>
+          <h2 className="text-xl font-semibold">Add Transaction</h2>
+          <p className="mt-1 text-sm text-secondary-text">
+            Record your income or expenses.
+          </p>
         </div>
-        <span className="form-heading-icon">
+
+        <span className="shrink-0 rounded-xl bg-accent/10 p-3 text-accent">
           <Plus size={22} />
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="transaction-form">
-        <div className="form-group">
-          <label>Transaction type</label>
-          <div className="transaction-type-toggle">
-            <button
-              type="button"
-              className={type === "expense" ? "type-option active expense-option" : "type-option"}
-              onClick={() => handleTypeChange("expense")}
-              aria-pressed={type === "expense"}
-            >
-              Expense
-            </button>
-            <button
-              type="button"
-              className={type === "income" ? "type-option active income-option" : "type-option"}
-              onClick={() => handleTypeChange("income")}
-              aria-pressed={type === "income"}
-            >
-              Income
-            </button>
+      <form onSubmit={handleSubmit} className="grid gap-5">
+        <div className="grid gap-2">
+          <label className="text-sm font-medium">
+            Transaction type
+          </label>
+
+          <div className="grid grid-cols-2 gap-2 rounded-xl bg-page p-1">
+            {["expense", "income"].map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => handleTypeChange(item)}
+                aria-pressed={type === item}
+                className={`rounded-lg border px-3 py-3 text-sm font-semibold capitalize transition ${
+                  type === item
+                    ? item === "income"
+                      ? "border-border bg-card text-income shadow-sm"
+                      : "border-border bg-card text-expense shadow-sm"
+                    : "border-transparent text-secondary-text hover:text-primary-text"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="transaction-amount">Amount (₹)</label>
+        <div className="grid gap-2">
+          <label htmlFor="transaction-amount" className="text-sm font-medium">
+            Amount (₹)
+          </label>
           <input
             id="transaction-amount"
             type="number"
@@ -150,16 +165,20 @@ export default function TransactionForm({ onTransactionAdded }) {
             placeholder="e.g. 1500.00"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
+            className={inputClasses}
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="transaction-category">Category</label>
+        <div className="grid gap-2">
+          <label htmlFor="transaction-category" className="text-sm font-medium">
+            Category
+          </label>
           <select
             id="transaction-category"
             value={category}
             onChange={(event) => setCategory(event.target.value)}
+            className={inputClasses}
             required
           >
             {categories[type].map((item) => (
@@ -170,20 +189,23 @@ export default function TransactionForm({ onTransactionAdded }) {
           </select>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="transaction-date">Date</label>
+        <div className="grid gap-2">
+          <label htmlFor="transaction-date" className="text-sm font-medium">
+            Date
+          </label>
           <input
             id="transaction-date"
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
+            className={inputClasses}
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="transaction-description">
-            Description <span className="optional-label">(optional)</span>
+        <div className="grid gap-2">
+          <label htmlFor="transaction-description" className="text-sm font-medium">
+            Description <span className="font-normal text-secondary-text">(optional)</span>
           </label>
           <input
             id="transaction-description"
@@ -192,29 +214,30 @@ export default function TransactionForm({ onTransactionAdded }) {
             placeholder="What was this transaction for?"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
+            className={inputClasses}
           />
         </div>
 
         {error && (
-          <p className="form-message error-message" role="alert">
+          <p role="alert" className="rounded-lg bg-expense/10 p-3 text-sm text-expense">
             {error}
           </p>
         )}
 
         {success && (
-          <p className="form-message success-message" role="status">
+          <p role="status" className="rounded-lg bg-income/10 p-3 text-sm text-income">
             {success}
           </p>
         )}
 
         <button
           type="submit"
-          className="submit-transaction"
           disabled={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? (
             <>
-              <LoaderCircle size={18} className="loading-icon" />
+              <LoaderCircle size={18} className="animate-spin" />
               Saving...
             </>
           ) : (

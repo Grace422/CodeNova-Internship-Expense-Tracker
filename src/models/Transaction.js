@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const transactionSchema = new mongoose.Schema(
@@ -55,4 +54,4 @@ const transactionSchema = new mongoose.Schema(
 transactionSchema.index({ date: -1 });
 
 export default mongoose.models.Transaction ||
-  mongoose.model("Transaction", transactionSchema);
+  mongoose.model("Transaction", transactionSchema, "ExpenseCollection");

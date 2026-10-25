@@ -51,10 +51,6 @@ export default function Home() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-accent p-3 text-white">
-              <Wallet size={27} />
-            </div>
-
             <div>
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                 Expense Tracker

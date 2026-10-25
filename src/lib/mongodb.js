@@ -1,36 +1,27 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const CONNECTION_STRING = process.env.DATABASE_URL;
+const DATABASE_NAME = process.env.DATABASE_NAME;
 
-if (!MONGODB_URI) {
-    throw new Error("MONGODB_URI is missing from .env.local");
+if (!CONNECTION_STRING) {
+    throw new Error("DATABASE_URL is missing from .env.local");
 }
 
-let cached = global.mongoose;
+if (!DATABASE_NAME) {
+    throw new Error("DATABASE_NAME is missing from .env.local");
+}
 
-if (!cached) {
-    cached = global.mongoose = {
-        conn: null,
-        promise: null
-    };
+const globalForMongo = globalThis;
+
+if (!globalForMongo.mongoClientPromise) {
+    const client = new MongoClient(CONNECTION_STRING);
+
+    globalForMongo.mongoClientPromise = client.connect();
 }
 
 export default async function connectDB() {
-    if (cached.conn) return cached.conn;
+    const client = await globalForMongo.mongoClientPromise;
+    const database = client.db(DATABASE_NAME);
 
-    if (!cached.promise) {
-        cached.promise = mongoose.connect(MONGODB_URI, {
-            serverSelectionTimeoutMS: 15000
-        });
-    }
-
-    try {
-        cached.conn = await cached.promise;
-        console.log("MongoDB connected successfully");
-        return cached.conn;
-    } catch (error) {
-        cached.promise = null;
-        console.error("MongoDB connection failed:", error);
-        throw error;
-    }
+    return database;
 }

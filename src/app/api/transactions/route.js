@@ -1,6 +1,6 @@
+
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import Transaction from "@/models/Transaction";
 
 const allowedCategories = {
   income: ["Salary", "Business", "Investment", "Other Income"],
@@ -18,15 +18,18 @@ const allowedCategories = {
 
 export async function GET() {
   try {
-    await connectDB();
+    const database = await connectDB();
 
-    const transactions = await Transaction.find()
+    const transactions = await database
+      .collection("ExpenseCollection")
+      .find({})
       .sort({ date: -1 })
-      .lean();
+      .toArray();
 
     return NextResponse.json(transactions, { status: 200 });
   } catch (error) {
     console.error("Fetch transactions error:", error);
+
     return NextResponse.json(
       { error: "Failed to fetch transactions" },
       { status: 500 }
@@ -57,7 +60,10 @@ export async function POST(request) {
       Math.round(numericAmount * 100) !== numericAmount * 100
     ) {
       return NextResponse.json(
-        { error: "Amount must be a positive number with at most two decimal places" },
+        {
+          error:
+            "Amount must be a positive number with at most two decimal places"
+        },
         { status: 400 }
       );
     }
@@ -88,25 +94,27 @@ export async function POST(request) {
       );
     }
 
-    await connectDB();
+    const database = await connectDB();
 
-    const transaction = await Transaction.create({
+    const transaction = {
       type,
       amount: numericAmount,
       category,
       description: description?.trim() ?? "",
-      date: transactionDate
-    });
+      date: transactionDate,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
 
-    return NextResponse.json(transaction, { status: 201 });
+    const result = await database
+      .collection("ExpenseCollection")
+      .insertOne(transaction);
+
+    return NextResponse.json(
+      { ...transaction, _id: result.insertedId },
+      { status: 201 }
+    );
   } catch (error) {
-    if (error.name === "ValidationError" || error.name === "CastError") {
-      return NextResponse.json(
-        { error: "Invalid transaction data" },
-        { status: 400 }
-      );
-    }
-
     console.error("Create transaction error:", error);
 
     return NextResponse.json(
