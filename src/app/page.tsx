@@ -27,8 +27,12 @@ export default function Home() {
       }
 
       setTransactions(Array.isArray(result) ? result : result.transactions || []);
-    } catch (err) {
-      setError(err.message || "Could not load transactions.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not load transactions."
+      );
     } finally {
       setLoading(false);
     }
