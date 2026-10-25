@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Wallet, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import DashboardCards from "@/components/Dashboard";
 import TransactionForm from "@/components/TransactionForm";
@@ -95,7 +95,7 @@ export default function Home() {
             <span>Loading your transactions...</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 items-start gap-6">
             <TransactionForm
               onTransactionAdded={handleTransactionAdded}
             />
