@@ -142,8 +142,8 @@ export default function TransactionForm({ onTransactionAdded }) {
                 className={`rounded-lg border px-3 py-3 text-sm font-semibold capitalize transition ${
                   type === item
                     ? item === "income"
-                      ? "border-border bg-card text-income shadow-sm"
-                      : "border-border bg-card text-expense shadow-sm"
+                      ? "border-border bg-[var(--card-bg)] text-income shadow-sm"
+                      : "border-border bg-[var(--card-bg)] text-expense shadow-sm"
                     : "border-transparent text-secondary-text hover:text-primary-text"
                 }`}
               >
